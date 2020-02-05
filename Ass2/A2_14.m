@@ -221,27 +221,6 @@ title('Input (\tau)')
 xlabel('Samples')
 ylabel('Torque [Nm]')
 legend('u_1', 'u_2', 'u_3', 'u_4')
-
-
-%% Unit Test
-clc
-A = 1; B = 1;
-Q = 1; R = 1; Pf = 1;
-N = 2;
-
-F2 = zeros(4,2);
-G2 = [1 0; -1 0; 0 1; 0 -1];
-h2 = [1; 1; 1; 1];
-
-F1 = [];
-G1 = [];
-h1 = [];
-
-x0 = [-5/3];
-
-[Z_b, VN_b] = CRHC2_14(A,B,N,Q,R,Pf,F1,G1,h1,F2,G2,h2,x0)
-[Z_dp, VN_dp] = CRHC1_14(A,B,N,Q,R,Pf,F1,G1,h1,F2,G2,h2,x0)
-
     
 
 
