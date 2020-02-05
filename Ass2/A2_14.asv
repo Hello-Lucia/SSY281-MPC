@@ -1,23 +1,22 @@
 clear;clc;
 %% Note that when you run this file, N2, N3, Pf3, and N5 should be defined in Workspace and have the correct values.
-%% Q1: Fill the DP_X.m function using the dynamic programic approach.
+%% Q1: Fill the DP_14.m function using the dynamic programic approach.
 
-%% Q2: Find the shortest N that stabilizes the system using DP_X.m ; define N2 that gives the shortest N, i.e. N2=min(N) subject to the system stability
+%% Q2: Find the shortest N that stabilizes the system using DP_14.m ; define N2 that gives the shortest N, i.e. N2=min(N) subject to the system stability
 clc
-A=[1.0025 0.1001;0.05 1.0025];
-B=[0.005;0.1001];
-C=[1 0];
-D=0;
+A = [1.0025 0.1001;0.05 1.0025];
+B = [0.005;0.1001];
+C = [1 0];
 
-Q=[5 0;0 1];
-Pf=[5 0;0 1];
-R=0.5;
+Q = [5 0;0 1];
+Pf = [5 0;0 1];
+R = 0.5;
 
 % Find shortest N
 N2 = 1;
 
 while 1
-    [K, P] = DP_X(A, B, N2, Q, R, Pf);
+    [K, P] = DP_14(A, B, N2, Q, R, Pf);
     poles = eig(A + B*K);
     
     if ~any(poles(:) >= 1)
@@ -41,7 +40,7 @@ N3 = 1; % Initial
 Pf3 = dare(A, B, Q, R) % from Q2
 
 while 1
-    [K, P] = DP_X(A, B, N3, Q, R, Pf3);
+    [K, P] = DP_14(A, B, N3, Q, R, Pf3);
     poles = eig(A + B*K);
     
     if ~any(poles(:) >= 1)
@@ -61,12 +60,12 @@ end
 Pf3 = P;
 
 
-%% Q4: Fill the BS_XX.m function using the batch solution approach.
-%% Q5: Find the shortest N that stabilizes the system using BS_XX.m; define N5 that gives the shortest N, i.e. N5=min(N) subject to the system stability
+%% Q4: Fill the BS_14X.m function using the batch solution approach.
+%% Q5: Find the shortest N that stabilizes the system using BS_14X.m; define N5 that gives the shortest N, i.e. N5=min(N) subject to the system stability
 clc
 N5 = 1;
 while 1
-    [K, P] = BS_X(A, B, N5, Q, R, Pf);
+    [K, P] = BS_14(A, B, N5, Q, R, Pf);
     poles = eig(A + B*K);
     
     if ~any(poles(:) >= 1)
@@ -85,9 +84,9 @@ end
 
 %N5=the shortest N!
 
-%% Q6: Use BS_XX.m or DP_XX.m and simulate the system for 20 steps; plot the inputs and the states for these four cases.
+%% Q6: Use BS_14X.m or DP_14X.m and simulate the system for 20 steps; plot the inputs and the states for these four cases.
 tf = 20;
-h = 0.1;
+h = 1;
 time = 1:(tf/h);
 x0 = [1;0];
 
@@ -97,16 +96,16 @@ x3(:,1) = x0;
 x4(:,1) = x0;
 
 R=0.5;N=5;
-[K1,P1] = DP_X(A,B,N,Q,R,Pf);
+[K1,P1] = DP_14(A,B,N,Q,R,Pf);
 
 R=0.5;N=15;
-[K2,P2] = DP_X(A,B,N,Q,R,Pf);
+[K2,P2] = DP_14(A,B,N,Q,R,Pf);
 
 R=0.05;N=5;
-[K3,P3] = DP_X(A,B,N,Q,R,Pf);
+[K3,P3] = DP_14(A,B,N,Q,R,Pf);
 
 R=0.05;N=15;
-[K4,P4] = DP_X(A,B,N,Q,R,Pf);
+[K4,P4] = DP_14(A,B,N,Q,R,Pf);
 
 for k = time
     u1(k) = K1*x1(:,k);
@@ -127,28 +126,30 @@ for k = time
 end
 
 fig = figure(1);
-fig.Position = [200 100 1000 500];
+fig.Position = [400 200 2000 1000];
 
 subplot(1,2,1)
 plot(time*h,[y1; y2; y3; y4;])
-title('States')
-xlabel('Time [s]')
-ylabel('Angle [deg]')
+grid on
+title('Output ( State x_1 = \theta )')
+xlabel('Samples')
+ylabel('Angle [rad]')
 legend('R=0.5     N=5','R=0.5     N=15', 'R=0.05   N=5', 'R=0.05   N=15')
 
 
 subplot(1,2,2)
 plot(time*h, [u1(:) u2(:) u3(:) u4(:)])
-title('Inputs')
+grid on
+title('Input (\tau)')
 xlabel('Time [s]')
 ylabel('Torque [Nm]')
 legend('u_1', 'u_2', 'u_3', 'u_4')
 
 
 
-%% Q7: Fill the CRHC1_X.m function
-%% Q8: Fill the CRHC2_X.m function
-%% Q9: Solve Q6 using CRHC1_X.m or CRHC2_X.m considering the given constraints for 100 sample times
+%% Q7: Fill the CRHC1_14.m function
+%% Q8: Fill the CRHC2_14.m function
+%% Q9: Solve Q6 using CRHC1_14.m or CRHC2_14.m considering the given constraints for 100 sample times
 clc
 clf
 A=[1.0025 0.1001;0.05 1.0025];
@@ -190,7 +191,7 @@ for s = 1:4
     u = [];
     x0 = [1; 0];
     for k = time
-        [Z, VN] = CRHC1_X(A,B,N,Q,R,Pf,F1,G1,h1,F2,G2,h2,x0);
+        [Z, VN] = CRHC1_14(A,B,N,Q,R,Pf,F1,G1,h1,F2,G2,h2,x0);
         x0 = [Z(1); Z(2)];
         x1(k) = Z(1);
         x2(k) = Z(2);
@@ -198,23 +199,28 @@ for s = 1:4
     end
     subplot(1,2,1)
     hold on
-    plot(time*h, rad2deg(x1(:)), 'LineWidth', 1);
+    plot(time*h, x1(:), 'LineWidth', 1);
     %plot(time*h, x2(:), '--');
     subplot(1,2,2)
     hold on
     plot(time*h, u(:), 'LineWidth',1);
 end
+
+% Make the state plot nice
 subplot(1,2,1)
 yl = ylim;
 ylim([yl(1)*1.1 yl(2)*1.1])
 hold off
+grid on
 title('Output ( State x_1 = \theta )')
 xlabel('Time [s]')
-ylabel('Angle [deg]')
+ylabel('Angle [rad]')
 legend('R=0.5     N=5','R=0.5     N=15', 'R=0.05   N=5', 'R=0.05   N=15')
 
+% Make the input plot nice
 subplot(1,2,2)
 hold off
+grid on
 title('Input (\tau)')
 xlabel('Time [s]')
 ylabel('Torque [Nm]')
@@ -237,8 +243,8 @@ h1 = [];
 
 x0 = [-5/3];
 
-[Z_b, VN_b] = CRHC2_X(A,B,N,Q,R,Pf,F1,G1,h1,F2,G2,h2,x0)
-[Z_dp, VN_dp] = CRHC1_X(A,B,N,Q,R,Pf,F1,G1,h1,F2,G2,h2,x0)
+[Z_b, VN_b] = CRHC2_14(A,B,N,Q,R,Pf,F1,G1,h1,F2,G2,h2,x0)
+[Z_dp, VN_dp] = CRHC1_14(A,B,N,Q,R,Pf,F1,G1,h1,F2,G2,h2,x0)
 
     
 
