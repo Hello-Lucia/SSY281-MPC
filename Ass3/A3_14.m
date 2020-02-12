@@ -17,8 +17,8 @@ b =  [0; 0; 0; 0; z_sp];
 
 x = A_s \ b;
 
-xs1 = x(1)
-us1 = x(2)
+xs1 = x(1:4)
+us1 = x(5:end)
 %% Question 2
 A=diag([0.5 0.6 0.5 0.6]);
 B=[0.5;0;0.25;0];
@@ -30,7 +30,7 @@ z_sp=[1;-1];
 
 syms u real; 
 n = length(A);
-e = z_sp - C*inv(eye(n)-A)*B*u;
+e = sqrt(z_sp - C*inv(eye(n)-A)*B*u);
 Vn = e'*e;
 
 % Find minimum analitically
@@ -41,12 +41,13 @@ u2s = solve(derv);
 H = 2 * 5/4;
 f = -1;
 
-us2 = quadprog(H,f);
-xs2 = inv(eye(n)-A)*B*us2;
+us2 = quadprog(H,f)
+xs2 = inv(eye(n)-A)*B*us2
 
 %xs2 =
 %us2 = 
 %% Question 3
+clc
 A=diag([0.5 0.6 0.5 0.6]);
 B=[diag([0.5 0.4]);diag([0.25 0.6])];
 C=[1 1 0 0];
@@ -98,7 +99,7 @@ x0 = [0.01;1;0.1]; % initial condition of system's state
 %==========================================================================
 %% choose one case, i.e. a, b, or c and then write the code for that case! for the other ones
 % you just need to change the example case!
-example = 'a';
+example = 'c';
 switch example
     case 'a'
         nd = 2;
@@ -171,7 +172,7 @@ Mss = inv(Ass) * bss
 %==========================================================================
 % Setup MPC controller
 %==========================================================================
-
+clc
 %sp=zeros(tf,3);         % setpoint trajectory
 
 N=10;                   % prediction horizon
@@ -183,41 +184,103 @@ R = 0.01*eye(m);         % control penalty
 %==========================================================================
 % Simulation
 %==========================================================================
-    
+% n is the dimension of the state
+% m is the dimension of the control signal
+% p is the dimension of the measured output
+% nd is the dimensions of the disturbances
 % Simulation
-    
+xe_hat = [zeros(n,1); zeros(nd,1)]; % Augmented state estimate
+clear x;
+x(:,1) = x0;
+
+
     for k = 1:tf
         
         %=============================
         % Calculate steady state target
         %=============================
-
+        d_hat = xe_hat(end-nd+1:end,k);
+        xs_us = Mss*d_hat;
+        xs = xs_us(1:n);
+        us = xs_us(end-m+1:end);
         
         %=============================
         % Solve the QP
         %=============================
-        [du, ~] = CRHC2_14(A,B,
+        x_hat = xe_hat(1:n, k);
+        dx = x_hat - xs;
+        
+        [du, ~] = CRHC(A,B,N,M,Q,R,Pf,[],[],[],[],[],[],dx);
+        u(:, k) = du(1:m) + us;
         
         %=============================
         % Update the observer state
         %=============================
-
+        y(:, k) = C*x(:, k);
+        
+        %Correction
+        xe_hat_corr = xe_hat(:, k) + Le*(y(:,k) - Ce*xe_hat(:,k));
+        %Prediction
+        xe_hat(:, k+1) = Ae*xe_hat_corr + Be*u(:, k);
         
         %=============================
         % Update the process state
         %=============================
-        
+        x(:,k+1) = A*x(:,k) + B*u(:,k) + Bp*d(k);
         
         %=============================        
         % Store current variables in log 
         %=============================
-
+        % Not needed since vector indexing is used instead
+        
    end % simulation loop
  
         %%
 %==========================================================================
 % Plot results
 %==========================================================================
-        
-   % plot the states, the state estimations, and the input and report them
-   % in the report.
+clf
+% plot the states, the state estimations, and the input and report them
+% in the report
+figure(1)
+
+% State plot + state estimation
+subplot(2,1,1)
+plot(x', 'Linewidth', 1)
+hold on
+plot(xe_hat(1:n,:)', '--', 'Linewidth', 1)
+title('States & state estimates')
+xlabel('Sample [k]')
+ylabel('State value')
+legend('c', 'T', 'h', '$\hat{c}$', '$\hat{T}$', '$\hat{h}$','Interpreter','latex','FontSize',14)
+
+% Inputs
+subplot(2,1,2)
+plot(u', 'Linewidth', 1)
+title('Inputs')
+xlabel('Sample [k]')
+ylabel('Input value')
+legend('$u_1$ - Coolant temp.', '$u_2$ - Flow rate','Interpreter','latex','FontSize',14)
+
+% Disturbance plot + disturbance estimation
+
+
+
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
