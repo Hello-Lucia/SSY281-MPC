@@ -101,7 +101,7 @@ x0 = [0.01;1;0.1]; % initial condition of system's state
 % you just need to change the example case!
 example = 'c';
 switch example
-    case 'a'
+    case 'c'
         nd = 2;
         Bd = zeros(n,nd);
         Cd = [1 0;0 0; 0 1]; 
@@ -113,6 +113,9 @@ switch example
         nd=3;
         %Bd = [0 0 0.1655;0 0 97.91; 0 0 -6.637]; 
         Bd = [zeros(3,2) Bp];
+        %Bd = eye(3,3);
+        %Bd = [zeros(3,2) ones(3,1)]; % Assume some disturbance on the
+        %states.
         Cd = [1 0 0;0 0 0;0 1 0];
 end
 
