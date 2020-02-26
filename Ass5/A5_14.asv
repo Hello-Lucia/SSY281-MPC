@@ -89,7 +89,7 @@ end
 %% Q4 
 % write your proof in the report
 
-%% Q5 a
+%% Q5
 % answer to the question in the report. Do note that you can verify your
 % answer by checking it numerically in Matlab (this is just for your own
 % and you may not provide any code regarding this)
@@ -101,14 +101,7 @@ test = det(A + B*K - lambda*eye(2))
 sol = solve(test, lambda) 
 
 %complex conjugate solution
-R_sol = [-16/20 + sqrt(16/20+1/5); -16/20 - sqrt(16/20+1/5)]
-%% b 
-clc
-
-P = Q + A'*Pf*A - A'*Pf*B*inv(R + B'*Pf*B)*B'*Pf*A;
-K = -inv(R+B'*P*B)*B'*P*A;
-eigs = det(A + B*K - lambda*eye(2))
-sol = solve(eigs, lambda) 
+R_sol = -16/20 + sqrt(16/20+1/5)
 
 %% Q6
 % answer in the report
