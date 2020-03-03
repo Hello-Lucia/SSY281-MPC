@@ -37,13 +37,12 @@ beq = h1 - F1*Omega*x0;
 
 
 % State and control constraints
-F2 = [kron(eye(N), [1 0; -1 0; 0 1; 0 -1]); zeros(N*2, n*N)];
-G2 = [zeros(N*n*2, m); kron(eye(N),[1;-1])];
-h2 = [repmat(x_ub, N*n*2, 1); repmat(u_ub, N*2, 1)];
+F2 = [eye(n*N); -eye(n*N); zeros(2*m*N, n*N)];
+G2 = [zeros(2*n*N,m*N); eye(m*N); -eye(m*N)];
+h2 = [repmat(x_ub,n*N,1); repmat(u_ub,2*m*N,1)];
 
 Ale = G2 + F2*Gamma;
 ble = h2 - F2*Omega*x0;
-
 
 
 options = optimset('Display', 'none');

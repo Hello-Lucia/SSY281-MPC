@@ -22,5 +22,57 @@ Q_bar = blkdiag( kron(eye(N-1),Q), Pf );
 R_bar = kron(eye(N),R);
 
 
+H = 2 * (R_bar + Gamma'*Q_bar*Gamma);
+f = ( (Omega*x0)'*Q_bar*Gamma + (Q_bar*Omega*x0)'*Gamma)';
+
+
+n = size(A,1);
+m = size(B,2);
+
+
+neXf = size(Xf.Ae, 1);
+    
+F1 = [zeros(neXf, (N-1)*n) Xf.Ae];
+G1 = zeros(neXf, N*m);
+h1 = Xf.be;
+
+Aeq = F1*Gamma + G1;
+beq = h1 - F1*Omega*x0;
+
+
+
+
+
+nXf = size(Xf.A, 1);
+F2 = [
+         eye(N*n);
+        -eye(N*n);
+        zeros(N*m, N*n);
+        zeros(N*m, N*n);
+        
+        [zeros(nXf, (N-1)*n) Xf.A];
+    ];
+G2 = [
+    zeros(N*n, N*m);
+    zeros(N*n, N*m);
+     eye(N*m);
+    -eye(N*m);
+
+    zeros(nXf, N*m);
+];
+h2 = [
+    kron(ones(2*N, 1), x_ub);
+    kron(ones(2*N, 1), u_ub);
+
+    Xf.b
+];
+
+Ale = G2 + F2*Gamma;
+ble = h2 - F2*Omega*x0;
+
+options = optimset('Display', 'none');
+[Z,~, exitflag] = quadprog(H, f, Ale, ble, Aeq, beq, [], [], [], options);
+
+
 
 end
