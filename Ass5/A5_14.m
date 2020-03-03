@@ -100,6 +100,8 @@ K = -inv(R+B'*Pf*B)*B'*Pf*A
 test = det(A + B*K - lambda*eye(2))
 sol = solve(test, lambda) 
 
+% plug sol into wolfram and find answer
+
 %complex conjugate solution
 R_sol = [-16/20 + sqrt(16/20+1/5); -16/20 - sqrt(16/20+1/5)]
 %% b 
@@ -109,6 +111,7 @@ P = Q + A'*Pf*A - A'*Pf*B*inv(R + B'*Pf*B)*B'*Pf*A;
 K = -inv(R+B'*P*B)*B'*P*A;
 eigs = det(A + B*K - lambda*eye(2))
 sol = solve(eigs, lambda) 
+% plug sol into wolfram and find answer
 
 %% Q6
 % answer in the report
