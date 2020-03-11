@@ -7,18 +7,24 @@ b = [0; 0; 1; 1];
 
 P1 = Polyhedron(A, b);
 figure(1)
+subplot(1,2,1)
 plot(P1)
+title('H representation')
+hold on
 
 H = P1.H;
 V = P1.V; % corner points
 P2 = Polyhedron('V', V);
-figure(2)
+subplot(1,2,2)
 plot(P2)
+title('V representation')
+
+
 
 %% Q2
 % define Q and P, find the sum and the difference and plot the results.
 % Sketch the plots in the report as well
-clc
+clc; close all;
 
 A1 = [0 1; 1 0; 0 -1; -1 0];
 b1 = [2; 2; 2; 2];
@@ -32,14 +38,23 @@ sum = plus(P,Q)
 diff = minus(P,Q)
 
 figure(1)
+subplot(2,2,1)
+plot(P)
+title('P')
+subplot(2,2,2)
+plot(Q)
+title('Q')
+subplot(2,2,3)
 plot(sum)
-
-figure(2)
+title('P + Q')
+subplot(2,2,4)
 plot(diff)
+title('P - Q')
 
 %% Q3
 % write a code that shows S is invariant and explain your approach in the
 % report
+close all;
 Ain = [1 0 -1 0 1 1 -1 -1; 0 1 0 -1 1 -1 1 -1]';
 bin = [1 1 1 1 1.5 1.5 1.5 1.5]';
 S = Polyhedron(Ain,bin);
@@ -165,16 +180,48 @@ fprintf("Feasable: %d\n", exitflag);
 Xf26 = Polyhedron('A', [1 0; -1 0; 0 1; 0 -1], 'b', [0; 0; 0; 0]);
 Xf2 = sys.invariantSet();
 
-XPre26 = sys.reachableSet('X', Xf26, 'direction', 'backward', 'N', 26);
-XPre2 = sys.reachableSet('X', Xf2, 'direction', 'backward', 'N', 2);
+xFeas = Polyhedron('lb', -x_ub, 'ub', x_ub);
+uFeas = Polyhedron('lb', -u_ub, 'ub', u_ub);
 
-figure(1)
+
+XPre26 = Pre_14(A,B,Xf26,uFeas);
+N = 26 - 1;
+for k = 1:N
+    XPre26 = Pre_14(A,B,XPre26,uFeas);
+    XPre26 = XPre26.intersect(xFeas);   %Intersect with ok states
+end
+
+XPre2 = Pre_14(A,B,Xf2, uFeas);
+XPre2 = XPre2.intersect(xFeas);
+XPre2 = Pre_14(A,B,XPre2, uFeas);
+XPre2 = XPre2.intersect(xFeas);
+
+figure(2)
+clf
 plot(XPre26, 'color', 'r', XPre2, 'color', 'r', 'alpha', 0.5);
-legend('X_{f-26}', 'X_{f-2}')
+hold on
+xFeas.plot('wire', true, 'linestyle', '--', 'linewidth', 2);
+
+legend('$X_f = \mathbf{0} \quad N = 26$', '$X_f = C_\infty \quad N = 2$', 'State constraints', 'Interpreter', 'latex')
 
 
 
+%% Extra investigation
+clf
 
+
+Xf = sys.invariantSet();
+sys.x.with('terminalSet');
+sys.x.terminalSet = Xf;
+
+Xlim = Polyhedron('lb', -x_ub, 'ub', x_ub);
+
+pre = sys.reachableSet('direction', 'backward', 'N', 10)
+figure(2)
+plot(pre)
+hold on
+plot(Xf, 'alpha', 0.5)
+plot(Xlim, 'color', 'b', 'alpha', 0.5)
 
 
 
