@@ -18,6 +18,7 @@ Ulim = Polyhedron('lb', -u_max, 'ub', u_max);
 Q = eye(2);             % Weight for states
 R = 100;                % Weight for control signals
 N = 3;
+
 % Terminal state is the origin
 Xf = Polyhedron('A', [1 0; -1 0; 0 1; 0 -1], 'b', [0; 0; 0; 0]);
 Pf =  Pf_14(A,B,Q,R);   % Terminal state weight.
@@ -75,6 +76,36 @@ fprintf('\n<a href="matlab:ectrl_new.clicksim()">%s</a>\n', "Simulate with termi
 % write the code to plot the requested figures. Provide the figures in your
 % report and explain your observation about the error between the state and
 % state prediction as N increases.
+close all;
+x0 = [4; -2.6];
+
+N = [10; 15; 20];
+
+for i = 1:length(N)
+    ctrl = MPCController(sys, N(i));
+    
+    % Prediction (open loop)
+    [~, ~, pred ] = ctrl.evaluate(x0);
+    
+    % Simulate (closed loop)
+    sim = ctrl.simulate(x0, N(i));
+    
+    
+    fig = figure(i);
+    fig.Units = 'normalized';
+    fig.Position = [(i-1)*0.33 0.1 0.15 0.2];
+    
+    plot(pred.X(1, :), pred.X(2,:), '.', 'color', 'b');
+    hold on
+    plot(sim.X(1, :), sim.X(2, :), '.', 'color', 'r');
+    
+    grid on
+    title("RH controller with N = " + num2str(N(i)))
+    xlabel('x_1')
+    ylabel('x_2')
+    legend('Prediction', 'Simulation')
+    
+end
 
 %% Question 3
 % no code is needed. Answer in the report
